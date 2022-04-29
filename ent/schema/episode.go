@@ -35,6 +35,7 @@ func (Episode) Fields() []ent.Field {
 			Annotations(&entsql.Annotation{
 				Default: "CURRENT_TIMESTAMP",
 			}),
+
 		field.Text("title").
 			NotEmpty(),
 		field.Text("summary").
@@ -45,6 +46,9 @@ func (Episode) Fields() []ent.Field {
 			Optional(),
 		field.JSON("content", &utils.Content{}).
 			Optional(),
+
+		field.Text("show_id").
+			NotEmpty(),
 	}
 }
 
@@ -53,6 +57,8 @@ func (Episode) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("owner", Show.Type).
 			Ref("episodes").
-			Unique(),
+			Unique().
+			Field("show_id").
+			Required(),
 	}
 }

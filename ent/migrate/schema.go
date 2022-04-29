@@ -17,7 +17,7 @@ var (
 		{Name: "summary", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "picture", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "content", Type: field.TypeJSON, Nullable: true},
-		{Name: "show_episodes", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "show_id", Type: field.TypeString, Size: 2147483647},
 	}
 	// EpisodesTable holds the schema information for the "episodes" table.
 	EpisodesTable = &schema.Table{
@@ -29,7 +29,7 @@ var (
 				Symbol:     "episodes_shows_episodes",
 				Columns:    []*schema.Column{EpisodesColumns[7]},
 				RefColumns: []*schema.Column{ShowsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -42,12 +42,21 @@ var (
 		{Name: "display_name", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "picture", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "content", Type: field.TypeJSON, Nullable: true},
+		{Name: "user_id", Type: field.TypeString, Nullable: true, Size: 2147483647},
 	}
 	// ProfilesTable holds the schema information for the "profiles" table.
 	ProfilesTable = &schema.Table{
 		Name:       "profiles",
 		Columns:    ProfilesColumns,
 		PrimaryKey: []*schema.Column{ProfilesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "profiles_users_profiles",
+				Columns:    []*schema.Column{ProfilesColumns[7]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// ShowsColumns holds the columns for the "shows" table.
 	ShowsColumns = []*schema.Column{
@@ -90,4 +99,5 @@ var (
 
 func init() {
 	EpisodesTable.ForeignKeys[0].RefTable = ShowsTable
+	ProfilesTable.ForeignKeys[0].RefTable = UsersTable
 }

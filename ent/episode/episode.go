@@ -23,6 +23,8 @@ const (
 	FieldPicture = "picture"
 	// FieldContent holds the string denoting the content field in the database.
 	FieldContent = "content"
+	// FieldShowID holds the string denoting the show_id field in the database.
+	FieldShowID = "show_id"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
 	// Table holds the table name of the episode in the database.
@@ -33,7 +35,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "show" package.
 	OwnerInverseTable = "shows"
 	// OwnerColumn is the table column denoting the owner relation/edge.
-	OwnerColumn = "show_episodes"
+	OwnerColumn = "show_id"
 )
 
 // Columns holds all SQL columns for episode fields.
@@ -45,23 +47,13 @@ var Columns = []string{
 	FieldSummary,
 	FieldPicture,
 	FieldContent,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "episodes"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"show_episodes",
+	FieldShowID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -79,6 +71,8 @@ var (
 	SummaryValidator func(string) error
 	// PictureValidator is a validator for the "picture" field. It is called by the builders before save.
 	PictureValidator func(string) error
+	// ShowIDValidator is a validator for the "show_id" field. It is called by the builders before save.
+	ShowIDValidator func(string) error
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )

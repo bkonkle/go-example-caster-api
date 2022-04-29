@@ -37,6 +37,10 @@ func init() {
 	episodeDescPicture := episodeFields[5].Descriptor()
 	// episode.PictureValidator is a validator for the "picture" field. It is called by the builders before save.
 	episode.PictureValidator = episodeDescPicture.Validators[0].(func(string) error)
+	// episodeDescShowID is the schema descriptor for show_id field.
+	episodeDescShowID := episodeFields[7].Descriptor()
+	// episode.ShowIDValidator is a validator for the "show_id" field. It is called by the builders before save.
+	episode.ShowIDValidator = episodeDescShowID.Validators[0].(func(string) error)
 	// episodeDescID is the schema descriptor for id field.
 	episodeDescID := episodeFields[0].Descriptor()
 	// episode.IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -63,6 +67,10 @@ func init() {
 	profileDescPicture := profileFields[5].Descriptor()
 	// profile.PictureValidator is a validator for the "picture" field. It is called by the builders before save.
 	profile.PictureValidator = profileDescPicture.Validators[0].(func(string) error)
+	// profileDescUserID is the schema descriptor for user_id field.
+	profileDescUserID := profileFields[7].Descriptor()
+	// profile.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
+	profile.UserIDValidator = profileDescUserID.Validators[0].(func(string) error)
 	// profileDescID is the schema descriptor for id field.
 	profileDescID := profileFields[0].Descriptor()
 	// profile.IDValidator is a validator for the "id" field. It is called by the builders before save.

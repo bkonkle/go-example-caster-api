@@ -23,8 +23,19 @@ const (
 	FieldPicture = "picture"
 	// FieldContent holds the string denoting the content field in the database.
 	FieldContent = "content"
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
+	// EdgeOwner holds the string denoting the owner edge name in mutations.
+	EdgeOwner = "owner"
 	// Table holds the table name of the profile in the database.
 	Table = "profiles"
+	// OwnerTable is the table that holds the owner relation/edge.
+	OwnerTable = "profiles"
+	// OwnerInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	OwnerInverseTable = "users"
+	// OwnerColumn is the table column denoting the owner relation/edge.
+	OwnerColumn = "user_id"
 )
 
 // Columns holds all SQL columns for profile fields.
@@ -36,6 +47,7 @@ var Columns = []string{
 	FieldDisplayName,
 	FieldPicture,
 	FieldContent,
+	FieldUserID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -59,6 +71,8 @@ var (
 	DisplayNameValidator func(string) error
 	// PictureValidator is a validator for the "picture" field. It is called by the builders before save.
 	PictureValidator func(string) error
+	// UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
+	UserIDValidator func(string) error
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )

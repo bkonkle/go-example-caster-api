@@ -412,6 +412,42 @@ func (m *EpisodeMutation) ResetContent() {
 	delete(m.clearedFields, episode.FieldContent)
 }
 
+// SetShowID sets the "show_id" field.
+func (m *EpisodeMutation) SetShowID(s string) {
+	m.owner = &s
+}
+
+// ShowID returns the value of the "show_id" field in the mutation.
+func (m *EpisodeMutation) ShowID() (r string, exists bool) {
+	v := m.owner
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldShowID returns the old "show_id" field's value of the Episode entity.
+// If the Episode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EpisodeMutation) OldShowID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldShowID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldShowID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldShowID: %w", err)
+	}
+	return oldValue.ShowID, nil
+}
+
+// ResetShowID resets all changes to the "show_id" field.
+func (m *EpisodeMutation) ResetShowID() {
+	m.owner = nil
+}
+
 // SetOwnerID sets the "owner" edge to the Show entity by id.
 func (m *EpisodeMutation) SetOwnerID(id string) {
 	m.owner = &id
@@ -470,7 +506,7 @@ func (m *EpisodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EpisodeMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, episode.FieldCreatedAt)
 	}
@@ -488,6 +524,9 @@ func (m *EpisodeMutation) Fields() []string {
 	}
 	if m.content != nil {
 		fields = append(fields, episode.FieldContent)
+	}
+	if m.owner != nil {
+		fields = append(fields, episode.FieldShowID)
 	}
 	return fields
 }
@@ -509,6 +548,8 @@ func (m *EpisodeMutation) Field(name string) (ent.Value, bool) {
 		return m.Picture()
 	case episode.FieldContent:
 		return m.Content()
+	case episode.FieldShowID:
+		return m.ShowID()
 	}
 	return nil, false
 }
@@ -530,6 +571,8 @@ func (m *EpisodeMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldPicture(ctx)
 	case episode.FieldContent:
 		return m.OldContent(ctx)
+	case episode.FieldShowID:
+		return m.OldShowID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Episode field %s", name)
 }
@@ -580,6 +623,13 @@ func (m *EpisodeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetContent(v)
+		return nil
+	case episode.FieldShowID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetShowID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Episode field %s", name)
@@ -668,6 +718,9 @@ func (m *EpisodeMutation) ResetField(name string) error {
 		return nil
 	case episode.FieldContent:
 		m.ResetContent()
+		return nil
+	case episode.FieldShowID:
+		m.ResetShowID()
 		return nil
 	}
 	return fmt.Errorf("unknown Episode field %s", name)
@@ -762,6 +815,8 @@ type ProfileMutation struct {
 	picture       *string
 	content       **utils.Content
 	clearedFields map[string]struct{}
+	owner         *string
+	clearedowner  bool
 	done          bool
 	oldValue      func(context.Context) (*Profile, error)
 	predicates    []predicate.Profile
@@ -1126,6 +1181,94 @@ func (m *ProfileMutation) ResetContent() {
 	delete(m.clearedFields, profile.FieldContent)
 }
 
+// SetUserID sets the "user_id" field.
+func (m *ProfileMutation) SetUserID(s string) {
+	m.owner = &s
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *ProfileMutation) UserID() (r string, exists bool) {
+	v := m.owner
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the Profile entity.
+// If the Profile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProfileMutation) OldUserID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (m *ProfileMutation) ClearUserID() {
+	m.owner = nil
+	m.clearedFields[profile.FieldUserID] = struct{}{}
+}
+
+// UserIDCleared returns if the "user_id" field was cleared in this mutation.
+func (m *ProfileMutation) UserIDCleared() bool {
+	_, ok := m.clearedFields[profile.FieldUserID]
+	return ok
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *ProfileMutation) ResetUserID() {
+	m.owner = nil
+	delete(m.clearedFields, profile.FieldUserID)
+}
+
+// SetOwnerID sets the "owner" edge to the User entity by id.
+func (m *ProfileMutation) SetOwnerID(id string) {
+	m.owner = &id
+}
+
+// ClearOwner clears the "owner" edge to the User entity.
+func (m *ProfileMutation) ClearOwner() {
+	m.clearedowner = true
+}
+
+// OwnerCleared reports if the "owner" edge to the User entity was cleared.
+func (m *ProfileMutation) OwnerCleared() bool {
+	return m.UserIDCleared() || m.clearedowner
+}
+
+// OwnerID returns the "owner" edge ID in the mutation.
+func (m *ProfileMutation) OwnerID() (id string, exists bool) {
+	if m.owner != nil {
+		return *m.owner, true
+	}
+	return
+}
+
+// OwnerIDs returns the "owner" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// OwnerID instead. It exists only for internal usage by the builders.
+func (m *ProfileMutation) OwnerIDs() (ids []string) {
+	if id := m.owner; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetOwner resets all changes to the "owner" edge.
+func (m *ProfileMutation) ResetOwner() {
+	m.owner = nil
+	m.clearedowner = false
+}
+
 // Where appends a list predicates to the ProfileMutation builder.
 func (m *ProfileMutation) Where(ps ...predicate.Profile) {
 	m.predicates = append(m.predicates, ps...)
@@ -1145,7 +1288,7 @@ func (m *ProfileMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProfileMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, profile.FieldCreatedAt)
 	}
@@ -1163,6 +1306,9 @@ func (m *ProfileMutation) Fields() []string {
 	}
 	if m.content != nil {
 		fields = append(fields, profile.FieldContent)
+	}
+	if m.owner != nil {
+		fields = append(fields, profile.FieldUserID)
 	}
 	return fields
 }
@@ -1184,6 +1330,8 @@ func (m *ProfileMutation) Field(name string) (ent.Value, bool) {
 		return m.Picture()
 	case profile.FieldContent:
 		return m.Content()
+	case profile.FieldUserID:
+		return m.UserID()
 	}
 	return nil, false
 }
@@ -1205,6 +1353,8 @@ func (m *ProfileMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldPicture(ctx)
 	case profile.FieldContent:
 		return m.OldContent(ctx)
+	case profile.FieldUserID:
+		return m.OldUserID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Profile field %s", name)
 }
@@ -1256,6 +1406,13 @@ func (m *ProfileMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetContent(v)
 		return nil
+	case profile.FieldUserID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Profile field %s", name)
 }
@@ -1295,6 +1452,9 @@ func (m *ProfileMutation) ClearedFields() []string {
 	if m.FieldCleared(profile.FieldContent) {
 		fields = append(fields, profile.FieldContent)
 	}
+	if m.FieldCleared(profile.FieldUserID) {
+		fields = append(fields, profile.FieldUserID)
+	}
 	return fields
 }
 
@@ -1317,6 +1477,9 @@ func (m *ProfileMutation) ClearField(name string) error {
 		return nil
 	case profile.FieldContent:
 		m.ClearContent()
+		return nil
+	case profile.FieldUserID:
+		m.ClearUserID()
 		return nil
 	}
 	return fmt.Errorf("unknown Profile nullable field %s", name)
@@ -1344,55 +1507,86 @@ func (m *ProfileMutation) ResetField(name string) error {
 	case profile.FieldContent:
 		m.ResetContent()
 		return nil
+	case profile.FieldUserID:
+		m.ResetUserID()
+		return nil
 	}
 	return fmt.Errorf("unknown Profile field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ProfileMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.owner != nil {
+		edges = append(edges, profile.EdgeOwner)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *ProfileMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case profile.EdgeOwner:
+		if id := m.owner; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ProfileMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *ProfileMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ProfileMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedowner {
+		edges = append(edges, profile.EdgeOwner)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *ProfileMutation) EdgeCleared(name string) bool {
+	switch name {
+	case profile.EdgeOwner:
+		return m.clearedowner
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *ProfileMutation) ClearEdge(name string) error {
+	switch name {
+	case profile.EdgeOwner:
+		m.ClearOwner()
+		return nil
+	}
 	return fmt.Errorf("unknown Profile unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *ProfileMutation) ResetEdge(name string) error {
+	switch name {
+	case profile.EdgeOwner:
+		m.ResetOwner()
+		return nil
+	}
 	return fmt.Errorf("unknown Profile edge %s", name)
 }
 
@@ -2139,17 +2333,20 @@ func (m *ShowMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *string
-	created_at    *time.Time
-	updated_at    *time.Time
-	username      *string
-	is_active     *bool
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*User, error)
-	predicates    []predicate.User
+	op              Op
+	typ             string
+	id              *string
+	created_at      *time.Time
+	updated_at      *time.Time
+	username        *string
+	is_active       *bool
+	clearedFields   map[string]struct{}
+	profiles        map[string]struct{}
+	removedprofiles map[string]struct{}
+	clearedprofiles bool
+	done            bool
+	oldValue        func(context.Context) (*User, error)
+	predicates      []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -2400,6 +2597,60 @@ func (m *UserMutation) ResetIsActive() {
 	m.is_active = nil
 }
 
+// AddProfileIDs adds the "profiles" edge to the Profile entity by ids.
+func (m *UserMutation) AddProfileIDs(ids ...string) {
+	if m.profiles == nil {
+		m.profiles = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.profiles[ids[i]] = struct{}{}
+	}
+}
+
+// ClearProfiles clears the "profiles" edge to the Profile entity.
+func (m *UserMutation) ClearProfiles() {
+	m.clearedprofiles = true
+}
+
+// ProfilesCleared reports if the "profiles" edge to the Profile entity was cleared.
+func (m *UserMutation) ProfilesCleared() bool {
+	return m.clearedprofiles
+}
+
+// RemoveProfileIDs removes the "profiles" edge to the Profile entity by IDs.
+func (m *UserMutation) RemoveProfileIDs(ids ...string) {
+	if m.removedprofiles == nil {
+		m.removedprofiles = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.profiles, ids[i])
+		m.removedprofiles[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedProfiles returns the removed IDs of the "profiles" edge to the Profile entity.
+func (m *UserMutation) RemovedProfilesIDs() (ids []string) {
+	for id := range m.removedprofiles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ProfilesIDs returns the "profiles" edge IDs in the mutation.
+func (m *UserMutation) ProfilesIDs() (ids []string) {
+	for id := range m.profiles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetProfiles resets all changes to the "profiles" edge.
+func (m *UserMutation) ResetProfiles() {
+	m.profiles = nil
+	m.clearedprofiles = false
+	m.removedprofiles = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -2569,48 +2820,84 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.profiles != nil {
+		edges = append(edges, user.EdgeProfiles)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *UserMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case user.EdgeProfiles:
+		ids := make([]ent.Value, 0, len(m.profiles))
+		for id := range m.profiles {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedprofiles != nil {
+		edges = append(edges, user.EdgeProfiles)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *UserMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case user.EdgeProfiles:
+		ids := make([]ent.Value, 0, len(m.removedprofiles))
+		for id := range m.removedprofiles {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedprofiles {
+		edges = append(edges, user.EdgeProfiles)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *UserMutation) EdgeCleared(name string) bool {
+	switch name {
+	case user.EdgeProfiles:
+		return m.clearedprofiles
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *UserMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown User unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *UserMutation) ResetEdge(name string) error {
+	switch name {
+	case user.EdgeProfiles:
+		m.ResetProfiles()
+		return nil
+	}
 	return fmt.Errorf("unknown User edge %s", name)
 }

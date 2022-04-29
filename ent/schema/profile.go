@@ -6,6 +6,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -34,6 +35,7 @@ func (Profile) Fields() []ent.Field {
 			Annotations(&entsql.Annotation{
 				Default: "CURRENT_TIMESTAMP",
 			}),
+
 		field.Text("email").
 			NotEmpty(),
 		field.Text("display_name").
@@ -44,10 +46,19 @@ func (Profile) Fields() []ent.Field {
 			Optional(),
 		field.JSON("content", &utils.Content{}).
 			Optional(),
+
+		field.Text("user_id").
+			NotEmpty().
+			Optional(),
 	}
 }
 
 // Edges of the Profile.
 func (Profile) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("owner", User.Type).
+			Ref("profiles").
+			Unique().
+			Field("user_id"),
+	}
 }

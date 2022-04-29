@@ -19,8 +19,17 @@ const (
 	FieldUsername = "username"
 	// FieldIsActive holds the string denoting the is_active field in the database.
 	FieldIsActive = "is_active"
+	// EdgeProfiles holds the string denoting the profiles edge name in mutations.
+	EdgeProfiles = "profiles"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// ProfilesTable is the table that holds the profiles relation/edge.
+	ProfilesTable = "profiles"
+	// ProfilesInverseTable is the table name for the Profile entity.
+	// It exists in this package in order to avoid circular dependency with the "profile" package.
+	ProfilesInverseTable = "profiles"
+	// ProfilesColumn is the table column denoting the profiles relation/edge.
+	ProfilesColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.

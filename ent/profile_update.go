@@ -5,6 +5,7 @@ package ent
 import (
 	"caster/ent/predicate"
 	"caster/ent/profile"
+	"caster/ent/user"
 	"caster/utils"
 	"context"
 	"errors"
@@ -115,9 +116,54 @@ func (pu *ProfileUpdate) ClearContent() *ProfileUpdate {
 	return pu
 }
 
+// SetUserID sets the "user_id" field.
+func (pu *ProfileUpdate) SetUserID(s string) *ProfileUpdate {
+	pu.mutation.SetUserID(s)
+	return pu
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (pu *ProfileUpdate) SetNillableUserID(s *string) *ProfileUpdate {
+	if s != nil {
+		pu.SetUserID(*s)
+	}
+	return pu
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (pu *ProfileUpdate) ClearUserID() *ProfileUpdate {
+	pu.mutation.ClearUserID()
+	return pu
+}
+
+// SetOwnerID sets the "owner" edge to the User entity by ID.
+func (pu *ProfileUpdate) SetOwnerID(id string) *ProfileUpdate {
+	pu.mutation.SetOwnerID(id)
+	return pu
+}
+
+// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
+func (pu *ProfileUpdate) SetNillableOwnerID(id *string) *ProfileUpdate {
+	if id != nil {
+		pu = pu.SetOwnerID(*id)
+	}
+	return pu
+}
+
+// SetOwner sets the "owner" edge to the User entity.
+func (pu *ProfileUpdate) SetOwner(u *User) *ProfileUpdate {
+	return pu.SetOwnerID(u.ID)
+}
+
 // Mutation returns the ProfileMutation object of the builder.
 func (pu *ProfileUpdate) Mutation() *ProfileMutation {
 	return pu.mutation
+}
+
+// ClearOwner clears the "owner" edge to the User entity.
+func (pu *ProfileUpdate) ClearOwner() *ProfileUpdate {
+	pu.mutation.ClearOwner()
+	return pu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -195,6 +241,11 @@ func (pu *ProfileUpdate) check() error {
 	if v, ok := pu.mutation.Picture(); ok {
 		if err := profile.PictureValidator(v); err != nil {
 			return &ValidationError{Name: "picture", err: fmt.Errorf(`ent: validator failed for field "Profile.picture": %w`, err)}
+		}
+	}
+	if v, ok := pu.mutation.UserID(); ok {
+		if err := profile.UserIDValidator(v); err != nil {
+			return &ValidationError{Name: "user_id", err: fmt.Errorf(`ent: validator failed for field "Profile.user_id": %w`, err)}
 		}
 	}
 	return nil
@@ -277,6 +328,41 @@ func (pu *ProfileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeJSON,
 			Column: profile.FieldContent,
 		})
+	}
+	if pu.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   profile.OwnerTable,
+			Columns: []string{profile.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: user.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   profile.OwnerTable,
+			Columns: []string{profile.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -383,9 +469,54 @@ func (puo *ProfileUpdateOne) ClearContent() *ProfileUpdateOne {
 	return puo
 }
 
+// SetUserID sets the "user_id" field.
+func (puo *ProfileUpdateOne) SetUserID(s string) *ProfileUpdateOne {
+	puo.mutation.SetUserID(s)
+	return puo
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (puo *ProfileUpdateOne) SetNillableUserID(s *string) *ProfileUpdateOne {
+	if s != nil {
+		puo.SetUserID(*s)
+	}
+	return puo
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (puo *ProfileUpdateOne) ClearUserID() *ProfileUpdateOne {
+	puo.mutation.ClearUserID()
+	return puo
+}
+
+// SetOwnerID sets the "owner" edge to the User entity by ID.
+func (puo *ProfileUpdateOne) SetOwnerID(id string) *ProfileUpdateOne {
+	puo.mutation.SetOwnerID(id)
+	return puo
+}
+
+// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
+func (puo *ProfileUpdateOne) SetNillableOwnerID(id *string) *ProfileUpdateOne {
+	if id != nil {
+		puo = puo.SetOwnerID(*id)
+	}
+	return puo
+}
+
+// SetOwner sets the "owner" edge to the User entity.
+func (puo *ProfileUpdateOne) SetOwner(u *User) *ProfileUpdateOne {
+	return puo.SetOwnerID(u.ID)
+}
+
 // Mutation returns the ProfileMutation object of the builder.
 func (puo *ProfileUpdateOne) Mutation() *ProfileMutation {
 	return puo.mutation
+}
+
+// ClearOwner clears the "owner" edge to the User entity.
+func (puo *ProfileUpdateOne) ClearOwner() *ProfileUpdateOne {
+	puo.mutation.ClearOwner()
+	return puo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -470,6 +601,11 @@ func (puo *ProfileUpdateOne) check() error {
 	if v, ok := puo.mutation.Picture(); ok {
 		if err := profile.PictureValidator(v); err != nil {
 			return &ValidationError{Name: "picture", err: fmt.Errorf(`ent: validator failed for field "Profile.picture": %w`, err)}
+		}
+	}
+	if v, ok := puo.mutation.UserID(); ok {
+		if err := profile.UserIDValidator(v); err != nil {
+			return &ValidationError{Name: "user_id", err: fmt.Errorf(`ent: validator failed for field "Profile.user_id": %w`, err)}
 		}
 	}
 	return nil
@@ -569,6 +705,41 @@ func (puo *ProfileUpdateOne) sqlSave(ctx context.Context) (_node *Profile, err e
 			Type:   field.TypeJSON,
 			Column: profile.FieldContent,
 		})
+	}
+	if puo.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   profile.OwnerTable,
+			Columns: []string{profile.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: user.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   profile.OwnerTable,
+			Columns: []string{profile.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Profile{config: puo.config}
 	_spec.Assign = _node.assignValues

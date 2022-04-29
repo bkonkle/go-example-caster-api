@@ -4,6 +4,7 @@ package ent
 
 import (
 	"caster/ent/profile"
+	"caster/ent/user"
 	"caster/utils"
 	"encoding/json"
 	"fmt"
@@ -30,6 +31,34 @@ type Profile struct {
 	Picture string `json:"picture,omitempty"`
 	// Content holds the value of the "content" field.
 	Content *utils.Content `json:"content,omitempty"`
+	// UserID holds the value of the "user_id" field.
+	UserID string `json:"user_id,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ProfileQuery when eager-loading is set.
+	Edges ProfileEdges `json:"edges"`
+}
+
+// ProfileEdges holds the relations/edges for other nodes in the graph.
+type ProfileEdges struct {
+	// Owner holds the value of the owner edge.
+	Owner *User `json:"owner,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// OwnerOrErr returns the Owner value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ProfileEdges) OwnerOrErr() (*User, error) {
+	if e.loadedTypes[0] {
+		if e.Owner == nil {
+			// The edge owner was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
+		return e.Owner, nil
+	}
+	return nil, &NotLoadedError{edge: "owner"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -39,7 +68,7 @@ func (*Profile) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case profile.FieldContent:
 			values[i] = new([]byte)
-		case profile.FieldID, profile.FieldEmail, profile.FieldDisplayName, profile.FieldPicture:
+		case profile.FieldID, profile.FieldEmail, profile.FieldDisplayName, profile.FieldPicture, profile.FieldUserID:
 			values[i] = new(sql.NullString)
 		case profile.FieldCreatedAt, profile.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -102,9 +131,20 @@ func (pr *Profile) assignValues(columns []string, values []interface{}) error {
 					return fmt.Errorf("unmarshal field content: %w", err)
 				}
 			}
+		case profile.FieldUserID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
+			} else if value.Valid {
+				pr.UserID = value.String
+			}
 		}
 	}
 	return nil
+}
+
+// QueryOwner queries the "owner" edge of the Profile entity.
+func (pr *Profile) QueryOwner() *UserQuery {
+	return (&ProfileClient{config: pr.config}).QueryOwner(pr)
 }
 
 // Update returns a builder for updating this Profile.
@@ -142,6 +182,8 @@ func (pr *Profile) String() string {
 	builder.WriteString(pr.Picture)
 	builder.WriteString(", content=")
 	builder.WriteString(fmt.Sprintf("%v", pr.Content))
+	builder.WriteString(", user_id=")
+	builder.WriteString(pr.UserID)
 	builder.WriteByte(')')
 	return builder.String()
 }

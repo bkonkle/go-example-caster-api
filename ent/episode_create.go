@@ -90,6 +90,12 @@ func (ec *EpisodeCreate) SetContent(u *utils.Content) *EpisodeCreate {
 	return ec
 }
 
+// SetShowID sets the "show_id" field.
+func (ec *EpisodeCreate) SetShowID(s string) *EpisodeCreate {
+	ec.mutation.SetShowID(s)
+	return ec
+}
+
 // SetID sets the "id" field.
 func (ec *EpisodeCreate) SetID(s string) *EpisodeCreate {
 	ec.mutation.SetID(s)
@@ -99,14 +105,6 @@ func (ec *EpisodeCreate) SetID(s string) *EpisodeCreate {
 // SetOwnerID sets the "owner" edge to the Show entity by ID.
 func (ec *EpisodeCreate) SetOwnerID(id string) *EpisodeCreate {
 	ec.mutation.SetOwnerID(id)
-	return ec
-}
-
-// SetNillableOwnerID sets the "owner" edge to the Show entity by ID if the given value is not nil.
-func (ec *EpisodeCreate) SetNillableOwnerID(id *string) *EpisodeCreate {
-	if id != nil {
-		ec = ec.SetOwnerID(*id)
-	}
 	return ec
 }
 
@@ -222,10 +220,21 @@ func (ec *EpisodeCreate) check() error {
 			return &ValidationError{Name: "picture", err: fmt.Errorf(`ent: validator failed for field "Episode.picture": %w`, err)}
 		}
 	}
+	if _, ok := ec.mutation.ShowID(); !ok {
+		return &ValidationError{Name: "show_id", err: errors.New(`ent: missing required field "Episode.show_id"`)}
+	}
+	if v, ok := ec.mutation.ShowID(); ok {
+		if err := episode.ShowIDValidator(v); err != nil {
+			return &ValidationError{Name: "show_id", err: fmt.Errorf(`ent: validator failed for field "Episode.show_id": %w`, err)}
+		}
+	}
 	if v, ok := ec.mutation.ID(); ok {
 		if err := episode.IDValidator(v); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Episode.id": %w`, err)}
 		}
+	}
+	if _, ok := ec.mutation.OwnerID(); !ok {
+		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Episode.owner"`)}
 	}
 	return nil
 }
@@ -328,7 +337,7 @@ func (ec *EpisodeCreate) createSpec() (*Episode, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.show_episodes = &nodes[0]
+		_node.ShowID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

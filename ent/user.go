@@ -24,6 +24,27 @@ type User struct {
 	Username string `json:"username,omitempty"`
 	// IsActive holds the value of the "is_active" field.
 	IsActive bool `json:"is_active,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges UserEdges `json:"edges"`
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// Profiles holds the value of the profiles edge.
+	Profiles []*Profile `json:"profiles,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// ProfilesOrErr returns the Profiles value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ProfilesOrErr() ([]*Profile, error) {
+	if e.loadedTypes[0] {
+		return e.Profiles, nil
+	}
+	return nil, &NotLoadedError{edge: "profiles"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -85,6 +106,11 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 		}
 	}
 	return nil
+}
+
+// QueryProfiles queries the "profiles" edge of the User entity.
+func (u *User) QueryProfiles() *ProfileQuery {
+	return (&UserClient{config: u.config}).QueryProfiles(u)
 }
 
 // Update returns a builder for updating this User.

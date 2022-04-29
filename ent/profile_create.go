@@ -4,6 +4,7 @@ package ent
 
 import (
 	"caster/ent/profile"
+	"caster/ent/user"
 	"caster/utils"
 	"context"
 	"errors"
@@ -89,10 +90,43 @@ func (pc *ProfileCreate) SetContent(u *utils.Content) *ProfileCreate {
 	return pc
 }
 
+// SetUserID sets the "user_id" field.
+func (pc *ProfileCreate) SetUserID(s string) *ProfileCreate {
+	pc.mutation.SetUserID(s)
+	return pc
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (pc *ProfileCreate) SetNillableUserID(s *string) *ProfileCreate {
+	if s != nil {
+		pc.SetUserID(*s)
+	}
+	return pc
+}
+
 // SetID sets the "id" field.
 func (pc *ProfileCreate) SetID(s string) *ProfileCreate {
 	pc.mutation.SetID(s)
 	return pc
+}
+
+// SetOwnerID sets the "owner" edge to the User entity by ID.
+func (pc *ProfileCreate) SetOwnerID(id string) *ProfileCreate {
+	pc.mutation.SetOwnerID(id)
+	return pc
+}
+
+// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
+func (pc *ProfileCreate) SetNillableOwnerID(id *string) *ProfileCreate {
+	if id != nil {
+		pc = pc.SetOwnerID(*id)
+	}
+	return pc
+}
+
+// SetOwner sets the "owner" edge to the User entity.
+func (pc *ProfileCreate) SetOwner(u *User) *ProfileCreate {
+	return pc.SetOwnerID(u.ID)
 }
 
 // Mutation returns the ProfileMutation object of the builder.
@@ -202,6 +236,11 @@ func (pc *ProfileCreate) check() error {
 			return &ValidationError{Name: "picture", err: fmt.Errorf(`ent: validator failed for field "Profile.picture": %w`, err)}
 		}
 	}
+	if v, ok := pc.mutation.UserID(); ok {
+		if err := profile.UserIDValidator(v); err != nil {
+			return &ValidationError{Name: "user_id", err: fmt.Errorf(`ent: validator failed for field "Profile.user_id": %w`, err)}
+		}
+	}
 	if v, ok := pc.mutation.ID(); ok {
 		if err := profile.IDValidator(v); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Profile.id": %w`, err)}
@@ -290,6 +329,26 @@ func (pc *ProfileCreate) createSpec() (*Profile, *sqlgraph.CreateSpec) {
 			Column: profile.FieldContent,
 		})
 		_node.Content = value
+	}
+	if nodes := pc.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   profile.OwnerTable,
+			Columns: []string{profile.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.UserID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

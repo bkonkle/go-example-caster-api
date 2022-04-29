@@ -383,7 +383,6 @@ func (sq *ShowQuery) sqlAll(ctx context.Context) ([]*Show, error) {
 			nodeids[nodes[i].ID] = nodes[i]
 			nodes[i].Edges.Episodes = []*Episode{}
 		}
-		query.withFKs = true
 		query.Where(predicate.Episode(func(s *sql.Selector) {
 			s.Where(sql.InValues(show.EpisodesColumn, fks...))
 		}))
@@ -392,13 +391,10 @@ func (sq *ShowQuery) sqlAll(ctx context.Context) ([]*Show, error) {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.show_episodes
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "show_episodes" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
+			fk := n.ShowID
+			node, ok := nodeids[fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "show_episodes" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "show_id" returned %v for node %v`, fk, n.ID)
 			}
 			node.Edges.Episodes = append(node.Edges.Episodes, n)
 		}

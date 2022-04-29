@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"caster/ent/profile"
 	"caster/ent/user"
 	"context"
 	"errors"
@@ -72,6 +73,21 @@ func (uc *UserCreate) SetNillableIsActive(b *bool) *UserCreate {
 func (uc *UserCreate) SetID(s string) *UserCreate {
 	uc.mutation.SetID(s)
 	return uc
+}
+
+// AddProfileIDs adds the "profiles" edge to the Profile entity by IDs.
+func (uc *UserCreate) AddProfileIDs(ids ...string) *UserCreate {
+	uc.mutation.AddProfileIDs(ids...)
+	return uc
+}
+
+// AddProfiles adds the "profiles" edges to the Profile entity.
+func (uc *UserCreate) AddProfiles(p ...*Profile) *UserCreate {
+	ids := make([]string, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return uc.AddProfileIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -250,6 +266,25 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldIsActive,
 		})
 		_node.IsActive = value
+	}
+	if nodes := uc.mutation.ProfilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ProfilesTable,
+			Columns: []string{user.ProfilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: profile.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

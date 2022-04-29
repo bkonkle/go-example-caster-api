@@ -27,7 +27,6 @@ type EpisodeQuery struct {
 	predicates []predicate.Episode
 	// eager-loading edges.
 	withOwner *ShowQuery
-	withFKs   bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -350,18 +349,11 @@ func (eq *EpisodeQuery) prepareQuery(ctx context.Context) error {
 func (eq *EpisodeQuery) sqlAll(ctx context.Context) ([]*Episode, error) {
 	var (
 		nodes       = []*Episode{}
-		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
 		loadedTypes = [1]bool{
 			eq.withOwner != nil,
 		}
 	)
-	if eq.withOwner != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, episode.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &Episode{config: eq.config}
 		nodes = append(nodes, node)
@@ -386,10 +378,7 @@ func (eq *EpisodeQuery) sqlAll(ctx context.Context) ([]*Episode, error) {
 		ids := make([]string, 0, len(nodes))
 		nodeids := make(map[string][]*Episode)
 		for i := range nodes {
-			if nodes[i].show_episodes == nil {
-				continue
-			}
-			fk := *nodes[i].show_episodes
+			fk := nodes[i].ShowID
 			if _, ok := nodeids[fk]; !ok {
 				ids = append(ids, fk)
 			}
@@ -403,7 +392,7 @@ func (eq *EpisodeQuery) sqlAll(ctx context.Context) ([]*Episode, error) {
 		for _, n := range neighbors {
 			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "show_episodes" returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "show_id" returned %v`, n.ID)
 			}
 			for i := range nodes {
 				nodes[i].Edges.Owner = n

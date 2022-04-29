@@ -31,10 +31,11 @@ type Episode struct {
 	Picture string `json:"picture,omitempty"`
 	// Content holds the value of the "content" field.
 	Content *utils.Content `json:"content,omitempty"`
+	// ShowID holds the value of the "show_id" field.
+	ShowID string `json:"show_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EpisodeQuery when eager-loading is set.
-	Edges         EpisodeEdges `json:"edges"`
-	show_episodes *string
+	Edges EpisodeEdges `json:"edges"`
 }
 
 // EpisodeEdges holds the relations/edges for other nodes in the graph.
@@ -67,12 +68,10 @@ func (*Episode) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case episode.FieldContent:
 			values[i] = new([]byte)
-		case episode.FieldID, episode.FieldTitle, episode.FieldSummary, episode.FieldPicture:
+		case episode.FieldID, episode.FieldTitle, episode.FieldSummary, episode.FieldPicture, episode.FieldShowID:
 			values[i] = new(sql.NullString)
 		case episode.FieldCreatedAt, episode.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case episode.ForeignKeys[0]: // show_episodes
-			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Episode", columns[i])
 		}
@@ -132,12 +131,11 @@ func (e *Episode) assignValues(columns []string, values []interface{}) error {
 					return fmt.Errorf("unmarshal field content: %w", err)
 				}
 			}
-		case episode.ForeignKeys[0]:
+		case episode.FieldShowID:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field show_episodes", values[i])
+				return fmt.Errorf("unexpected type %T for field show_id", values[i])
 			} else if value.Valid {
-				e.show_episodes = new(string)
-				*e.show_episodes = value.String
+				e.ShowID = value.String
 			}
 		}
 	}
@@ -184,6 +182,8 @@ func (e *Episode) String() string {
 	builder.WriteString(e.Picture)
 	builder.WriteString(", content=")
 	builder.WriteString(fmt.Sprintf("%v", e.Content))
+	builder.WriteString(", show_id=")
+	builder.WriteString(e.ShowID)
 	builder.WriteByte(')')
 	return builder.String()
 }

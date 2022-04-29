@@ -116,17 +116,15 @@ func (eu *EpisodeUpdate) ClearContent() *EpisodeUpdate {
 	return eu
 }
 
-// SetOwnerID sets the "owner" edge to the Show entity by ID.
-func (eu *EpisodeUpdate) SetOwnerID(id string) *EpisodeUpdate {
-	eu.mutation.SetOwnerID(id)
+// SetShowID sets the "show_id" field.
+func (eu *EpisodeUpdate) SetShowID(s string) *EpisodeUpdate {
+	eu.mutation.SetShowID(s)
 	return eu
 }
 
-// SetNillableOwnerID sets the "owner" edge to the Show entity by ID if the given value is not nil.
-func (eu *EpisodeUpdate) SetNillableOwnerID(id *string) *EpisodeUpdate {
-	if id != nil {
-		eu = eu.SetOwnerID(*id)
-	}
+// SetOwnerID sets the "owner" edge to the Show entity by ID.
+func (eu *EpisodeUpdate) SetOwnerID(id string) *EpisodeUpdate {
+	eu.mutation.SetOwnerID(id)
 	return eu
 }
 
@@ -222,6 +220,14 @@ func (eu *EpisodeUpdate) check() error {
 		if err := episode.PictureValidator(v); err != nil {
 			return &ValidationError{Name: "picture", err: fmt.Errorf(`ent: validator failed for field "Episode.picture": %w`, err)}
 		}
+	}
+	if v, ok := eu.mutation.ShowID(); ok {
+		if err := episode.ShowIDValidator(v); err != nil {
+			return &ValidationError{Name: "show_id", err: fmt.Errorf(`ent: validator failed for field "Episode.show_id": %w`, err)}
+		}
+	}
+	if _, ok := eu.mutation.OwnerID(); eu.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Episode.owner"`)
 	}
 	return nil
 }
@@ -444,17 +450,15 @@ func (euo *EpisodeUpdateOne) ClearContent() *EpisodeUpdateOne {
 	return euo
 }
 
-// SetOwnerID sets the "owner" edge to the Show entity by ID.
-func (euo *EpisodeUpdateOne) SetOwnerID(id string) *EpisodeUpdateOne {
-	euo.mutation.SetOwnerID(id)
+// SetShowID sets the "show_id" field.
+func (euo *EpisodeUpdateOne) SetShowID(s string) *EpisodeUpdateOne {
+	euo.mutation.SetShowID(s)
 	return euo
 }
 
-// SetNillableOwnerID sets the "owner" edge to the Show entity by ID if the given value is not nil.
-func (euo *EpisodeUpdateOne) SetNillableOwnerID(id *string) *EpisodeUpdateOne {
-	if id != nil {
-		euo = euo.SetOwnerID(*id)
-	}
+// SetOwnerID sets the "owner" edge to the Show entity by ID.
+func (euo *EpisodeUpdateOne) SetOwnerID(id string) *EpisodeUpdateOne {
+	euo.mutation.SetOwnerID(id)
 	return euo
 }
 
@@ -557,6 +561,14 @@ func (euo *EpisodeUpdateOne) check() error {
 		if err := episode.PictureValidator(v); err != nil {
 			return &ValidationError{Name: "picture", err: fmt.Errorf(`ent: validator failed for field "Episode.picture": %w`, err)}
 		}
+	}
+	if v, ok := euo.mutation.ShowID(); ok {
+		if err := episode.ShowIDValidator(v); err != nil {
+			return &ValidationError{Name: "show_id", err: fmt.Errorf(`ent: validator failed for field "Episode.show_id": %w`, err)}
+		}
+	}
+	if _, ok := euo.mutation.OwnerID(); euo.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Episode.owner"`)
 	}
 	return nil
 }

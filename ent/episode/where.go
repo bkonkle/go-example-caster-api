@@ -128,6 +128,13 @@ func Picture(v string) predicate.Episode {
 	})
 }
 
+// ShowID applies equality check predicate on the "show_id" field. It's identical to ShowIDEQ.
+func ShowID(v string) predicate.Episode {
+	return predicate.Episode(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldShowID), v))
+	})
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Episode {
 	return predicate.Episode(func(s *sql.Selector) {
@@ -652,6 +659,117 @@ func ContentIsNil() predicate.Episode {
 func ContentNotNil() predicate.Episode {
 	return predicate.Episode(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldContent)))
+	})
+}
+
+// ShowIDEQ applies the EQ predicate on the "show_id" field.
+func ShowIDEQ(v string) predicate.Episode {
+	return predicate.Episode(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldShowID), v))
+	})
+}
+
+// ShowIDNEQ applies the NEQ predicate on the "show_id" field.
+func ShowIDNEQ(v string) predicate.Episode {
+	return predicate.Episode(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldShowID), v))
+	})
+}
+
+// ShowIDIn applies the In predicate on the "show_id" field.
+func ShowIDIn(vs ...string) predicate.Episode {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Episode(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldShowID), v...))
+	})
+}
+
+// ShowIDNotIn applies the NotIn predicate on the "show_id" field.
+func ShowIDNotIn(vs ...string) predicate.Episode {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Episode(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldShowID), v...))
+	})
+}
+
+// ShowIDGT applies the GT predicate on the "show_id" field.
+func ShowIDGT(v string) predicate.Episode {
+	return predicate.Episode(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldShowID), v))
+	})
+}
+
+// ShowIDGTE applies the GTE predicate on the "show_id" field.
+func ShowIDGTE(v string) predicate.Episode {
+	return predicate.Episode(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldShowID), v))
+	})
+}
+
+// ShowIDLT applies the LT predicate on the "show_id" field.
+func ShowIDLT(v string) predicate.Episode {
+	return predicate.Episode(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldShowID), v))
+	})
+}
+
+// ShowIDLTE applies the LTE predicate on the "show_id" field.
+func ShowIDLTE(v string) predicate.Episode {
+	return predicate.Episode(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldShowID), v))
+	})
+}
+
+// ShowIDContains applies the Contains predicate on the "show_id" field.
+func ShowIDContains(v string) predicate.Episode {
+	return predicate.Episode(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldShowID), v))
+	})
+}
+
+// ShowIDHasPrefix applies the HasPrefix predicate on the "show_id" field.
+func ShowIDHasPrefix(v string) predicate.Episode {
+	return predicate.Episode(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldShowID), v))
+	})
+}
+
+// ShowIDHasSuffix applies the HasSuffix predicate on the "show_id" field.
+func ShowIDHasSuffix(v string) predicate.Episode {
+	return predicate.Episode(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldShowID), v))
+	})
+}
+
+// ShowIDEqualFold applies the EqualFold predicate on the "show_id" field.
+func ShowIDEqualFold(v string) predicate.Episode {
+	return predicate.Episode(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldShowID), v))
+	})
+}
+
+// ShowIDContainsFold applies the ContainsFold predicate on the "show_id" field.
+func ShowIDContainsFold(v string) predicate.Episode {
+	return predicate.Episode(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldShowID), v))
 	})
 }
 
