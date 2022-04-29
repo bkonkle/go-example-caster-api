@@ -1,0 +1,696 @@
+"""
+The `CreateEpisodeInput` input type
+"""
+input CreateEpisodeInput {
+  """
+  The Episode's title
+  """
+  title: String!
+  """
+  The Episode's description summary
+  """
+  summary: String
+  """
+  The Episode's picture
+  """
+  picture: String
+  """
+  The Episode json content
+  """
+  content: JSON
+  """
+  The Episode's Show id
+  """
+  showId: String!
+}
+"""
+The `CreateProfileInput` input type
+"""
+input CreateProfileInput {
+  """
+  The Profile's email address
+  """
+  email: String!
+  """
+  The Profile's display name
+  """
+  displayName: String
+  """
+  The Profile's picture
+  """
+  picture: String
+  """
+  The Profile json content
+  """
+  content: JSON
+  """
+  The Profile's city
+  """
+  city: String
+  """
+  The Profile's state or province
+  """
+  stateProvince: String
+  """
+  The Profile's User id
+  """
+  userId: String!
+}
+"""
+The `CreateShowInput` input type
+"""
+input CreateShowInput {
+  """
+  The Show's title
+  """
+  title: String!
+  """
+  The Show's description summary
+  """
+  summary: String
+  """
+  The Show's picture
+  """
+  picture: String
+  """
+  The Show json content
+  """
+  content: JSON
+}
+"""
+The `CreateUserInput` input type
+"""
+input CreateUserInput {
+  """
+  The User's profile
+  """
+  profile: CreateUserProfileInput
+}
+"""
+The `CreateUserProfileInput` input type
+"""
+input CreateUserProfileInput {
+  """
+  The Profile's email address
+  """
+  email: String!
+  """
+  The Profile's display name
+  """
+  displayName: String
+  """
+  The Profile's picture
+  """
+  picture: String
+  """
+  The Profile json content
+  """
+  content: JSON
+  """
+  The Profile's city
+  """
+  city: String
+  """
+  The Profile's state or province
+  """
+  stateProvince: String
+}
+"""
+The User GraphQL and Database Model
+"""
+type Episode {
+  """
+  The Episode id
+  """
+  id: String!
+  """
+  The date the Episode was created
+  """
+  createdAt: NaiveDateTime!
+  """
+  The date the Episode was last updated
+  """
+  updatedAt: NaiveDateTime!
+  """
+  The Episode title
+  """
+  title: String!
+  """
+  An optional Episode summary
+  """
+  summary: String
+  """
+  An optional Episode image
+  """
+  picture: String
+  """
+  Optional Json content for a Episode
+  """
+  content: JSON
+  """
+  The Episode's Show id
+  """
+  showId: String!
+  show: Show
+}
+"""
+Conditions to filter Episode listings by
+"""
+input EpisodeCondition {
+  """
+  The `Episode`'s title
+  """
+  title: String
+  """
+  The associated Show
+  """
+  showId: String
+}
+"""
+The available ordering values
+"""
+enum EpisodesOrderBy {
+  ID_ASC
+  ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+  SHOW_ID_ASC
+  SHOW_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+"""
+The `EpisodesPage` result type
+"""
+type EpisodesPage {
+  """
+  The list of `Episodes` returned for the current page
+  """
+  data: [Episode!]!
+  """
+  The number of `Episodes` returned for the current page
+  """
+  count: Int!
+  """
+  Tne total number of `Episodes` available
+  """
+  total: Int!
+  """
+  The current page
+  """
+  page: Int!
+  """
+  The number of pages available
+  """
+  pageCount: Int!
+}
+"""
+A scalar that can represent any JSON value.
+"""
+scalar JSON
+"""
+The `RoleGrant` GraphQL and Database Model
+"""
+type Model {
+  """
+  The RoleGrant id
+  """
+  id: String!
+  """
+  The date the RoleGrant was created
+  """
+  createdAt: NaiveDateTime!
+  """
+  The date the RoleGrant was last updated
+  """
+  updatedAt: NaiveDateTime!
+  """
+  The key of the Role being granted to the Role
+  """
+  roleKey: String!
+  """
+  The User id that the Role is being granted to
+  """
+  userId: String!
+  """
+  The table of the resource that the Role is being granted for
+  """
+  resourceTable: String!
+  """
+  The id of the resource that the Role is being granted for
+  """
+  resourceId: String!
+}
+"""
+The `MutateEpisodeResult` type
+"""
+type MutateEpisodeResult {
+  """
+  The Episode's subscriber id
+  """
+  episode: Episode
+}
+"""
+The `MutateProfileResult` type
+"""
+type MutateProfileResult {
+  """
+  The Profile's subscriber id
+  """
+  profile: Profile
+}
+"""
+The `MutateShowResult` type
+"""
+type MutateShowResult {
+  """
+  The Show's subscriber id
+  """
+  show: Show
+}
+"""
+The `MutateUserResult` input type
+"""
+type MutateUserResult {
+  """
+  The User's subscriber id
+  """
+  user: User
+}
+"""
+The GraphQL top-level Mutation type
+"""
+type Mutation {
+  """
+  Get or create the current User based on the current token username (the "sub" claim)
+  """
+  getOrCreateCurrentUser(input: CreateUserInput!): MutateUserResult!
+  """
+  Update the current User based on the current token username (the "sub" claim)
+  """
+  updateCurrentUser(input: UpdateUserInput!): MutateUserResult!
+  """
+  Create a new Profile
+  """
+  createProfile(input: CreateProfileInput!): MutateProfileResult!
+  """
+  Update an existing Profile
+  """
+  updateProfile(id: String!, input: UpdateProfileInput!): MutateProfileResult!
+  """
+  Remove an existing Profile
+  """
+  deleteProfile(id: String!): Boolean!
+  """
+  Create a new Show
+  """
+  createShow(input: CreateShowInput!): MutateShowResult!
+  """
+  Update an existing Show
+  """
+  updateShow(id: String!, input: UpdateShowInput!): MutateShowResult!
+  """
+  Remove an existing Show
+  """
+  deleteShow(id: String!): Boolean!
+  """
+  Create a new Episode
+  """
+  createEpisode(input: CreateEpisodeInput!): MutateEpisodeResult!
+  """
+  Update an existing Episode
+  """
+  updateEpisode(id: String!, input: UpdateEpisodeInput!): MutateEpisodeResult!
+  """
+  Remove an existing Episode
+  """
+  deleteEpisode(id: String!): Boolean!
+}
+"""
+ISO 8601 combined date and time without timezone.
+
+# Examples
+
+* `2015-07-01T08:59:60.123`,
+"""
+scalar NaiveDateTime
+"""
+The `Profile` GraphQL model
+"""
+type Profile {
+  """
+  The `Profile` id
+  """
+  id: String!
+  """
+  The date the `Profile` was created
+  """
+  createdAt: NaiveDateTime!
+  """
+  The date the `Profile` was last updated
+  """
+  updatedAt: NaiveDateTime!
+  """
+  The `Profile`'s email address
+  """
+  email: String
+  """
+  The `Profile`'s display name
+  """
+  displayName: String
+  """
+  The `Profile`'s picture
+  """
+  picture: String
+  """
+  The `Profile` json content
+  """
+  content: JSON
+  """
+  The `Profile`'s city
+  """
+  city: String
+  """
+  The `Profile`'s state or province
+  """
+  stateProvince: String
+  """
+  The `Profile`'s `User` id
+  """
+  userId: String
+  user: User
+}
+"""
+Conditions to filter Profile listings by
+"""
+input ProfileCondition {
+  """
+  The `Profile`'s email address
+  """
+  email: String
+  """
+  The `Profile`'s display name
+  """
+  displayName: String
+  """
+  The `Profile`'s city
+  """
+  city: String
+  """
+  The `Profile`'s state or province
+  """
+  stateProvince: String
+  """
+  The `Profile`'s User id
+  """
+  userId: String
+}
+"""
+The available ordering values
+"""
+enum ProfilesOrderBy {
+  ID_ASC
+  ID_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  DISPLAY_NAME_ASC
+  DISPLAY_NAME_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+"""
+The `ProfilesPage` result type
+"""
+type ProfilesPage {
+  """
+  The list of `Profiles` returned for the current page
+  """
+  data: [Profile!]!
+  """
+  The number of `Profiles` returned for the current page
+  """
+  count: Int!
+  """
+  Tne total number of `Profiles` available
+  """
+  total: Int!
+  """
+  The current page
+  """
+  page: Int!
+  """
+  The number of pages available
+  """
+  pageCount: Int!
+}
+"""
+The GraphQL top-level Query type
+"""
+type Query {
+  """
+  Get the current User from the GraphQL context
+  """
+  getCurrentUser: User
+  """
+  Get a single Profile
+  """
+  getProfile(id: String!): Profile
+  """
+  Get multiple Profiles
+  """
+  getManyProfiles(
+    where: ProfileCondition
+    orderBy: [ProfilesOrderBy!]
+    page: Int
+    pageSize: Int
+  ): ProfilesPage!
+  getShow(id: String!): Show
+  """
+  Get multiple Shows
+  """
+  getManyShows(
+    where: ShowCondition
+    orderBy: [ShowsOrderBy!]
+    page: Int
+    pageSize: Int
+  ): ShowsPage!
+  getEpisode(id: String!): Episode
+  """
+  Get multiple Episodes
+  """
+  getManyEpisodes(
+    where: EpisodeCondition
+    orderBy: [EpisodesOrderBy!]
+    page: Int
+    pageSize: Int
+  ): EpisodesPage!
+}
+"""
+The Show GraphQL and Database Model
+"""
+type Show {
+  """
+  The Show id
+  """
+  id: String!
+  """
+  The date the Show was created
+  """
+  createdAt: NaiveDateTime!
+  """
+  The date the Show was last updated
+  """
+  updatedAt: NaiveDateTime!
+  """
+  The Show title
+  """
+  title: String!
+  """
+  An optional Show summary
+  """
+  summary: String
+  """
+  An optional Show image
+  """
+  picture: String
+  """
+  Optional Json content for a Show
+  """
+  content: JSON
+}
+"""
+Conditions to filter Show listings by
+"""
+input ShowCondition {
+  """
+  The `Show`'s title
+  """
+  title: String
+}
+"""
+The available ordering values
+"""
+enum ShowsOrderBy {
+  ID_ASC
+  ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+"""
+The `ShowsPage` result type
+"""
+type ShowsPage {
+  """
+  The list of `Shows` returned for the current page
+  """
+  data: [Show!]!
+  """
+  The number of `Shows` returned for the current page
+  """
+  count: Int!
+  """
+  Tne total number of `Shows` available
+  """
+  total: Int!
+  """
+  The current page
+  """
+  page: Int!
+  """
+  The number of pages available
+  """
+  pageCount: Int!
+}
+"""
+The `UpdateEpisodeInput` input type
+"""
+input UpdateEpisodeInput {
+  """
+  The Episode's title
+  """
+  title: String
+  """
+  The Episode's description summary
+  """
+  summary: String
+  """
+  The Episode's picture
+  """
+  picture: String
+  """
+  The Episode json content
+  """
+  content: JSON
+  """
+  The Episode's Show id
+  """
+  showId: String
+}
+"""
+The `UpdateProfileInput` input type
+"""
+input UpdateProfileInput {
+  """
+  The Profile's email address
+  """
+  email: String
+  """
+  The Profile's display name
+  """
+  displayName: String
+  """
+  The Profile's picture
+  """
+  picture: String
+  """
+  The Profile json content
+  """
+  content: JSON
+  """
+  The Profile's city
+  """
+  city: String
+  """
+  The Profile's state or province
+  """
+  stateProvince: String
+  """
+  The Profile's User id
+  """
+  userId: String
+}
+"""
+The `UpdateShowInput` input type
+"""
+input UpdateShowInput {
+  """
+  The Show's title
+  """
+  title: String
+  """
+  The Show's description summary
+  """
+  summary: String
+  """
+  The Show's picture
+  """
+  picture: String
+  """
+  The Show json content
+  """
+  content: JSON
+}
+"""
+The `UpdateUserInput` input type
+"""
+input UpdateUserInput {
+  """
+  The User's subscriber id
+  """
+  username: String
+  """
+  Whether the User is active or disabled
+  """
+  isActive: Boolean
+}
+"""
+The User GraphQL and Database Model
+"""
+type User {
+  """
+  The User id
+  """
+  id: String!
+  """
+  The date the User was created
+  """
+  createdAt: NaiveDateTime!
+  """
+  The date the User was last updated
+  """
+  updatedAt: NaiveDateTime!
+  """
+  The User's subscriber id
+  """
+  username: String!
+  """
+  Whether the User is active or disabled
+  """
+  isActive: Boolean!
+  """
+  Related RoleGrants
+  """
+  roles: [Model!]!
+}
+schema {
+  query: Query
+  mutation: Mutation
+}
