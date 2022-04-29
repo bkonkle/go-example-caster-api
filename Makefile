@@ -16,3 +16,7 @@ GO_LDFLAGS += -X $(GO_PROJECT)/internal/version.Version=$(VERSION)
 GO_SUBDIRS += cmd internal
 GO111MODULE = on
 -include build/makelib/golang.mk
+
+.PHONY: docker-up
+docker-up:
+	docker-compose -f docker-compose.yml up -d
